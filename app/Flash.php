@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Flash Messaging
+ */
 class Flash {
     public static function set($key, $message, $type = 'info') {
         if (session_status() === PHP_SESSION_NONE) {

@@ -1,10 +1,18 @@
-USE inventory_atk;
+USE inventory_at;
+
+-- Clear existing data
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE stock_transactions;
+TRUNCATE TABLE stock_balances;
+TRUNCATE TABLE items;
+TRUNCATE TABLE users;
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- Seed Users (password: password123)
 -- Hash generated via password_hash('password123', PASSWORD_BCRYPT)
 INSERT INTO users (nama, email, password) VALUES 
-('Administrator', 'admin@atk.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
-('Petugas Gudang', 'gudang@atk.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
+('Administrator', 'admin@atk.test', '$2y$10$g8q7SPs5kd9aGbFNeJtBuewrpCbSTZxDlaLsy9sVf2s0/GMYa0Pwa'),
+('Petugas Gudang', 'gudang@atk.test', '$2y$10$g8q7SPs5kd9aGbFNeJtBuewrpCbSTZxDlaLsy9sVf2s0/GMYa0Pwa');
 
 -- Seed Items (15 Items)
 INSERT INTO items (kode, nama, satuan, stok_minimum) VALUES 
@@ -52,7 +60,7 @@ INSERT INTO stock_transactions (idempotency_key, item_id, tipe, jumlah, arah, ta
 -- Update stock_balances based on transactions
 UPDATE stock_balances sb 
 SET saldo = (
-    SELECT COALESCE(SUM(jumlah * arah), 0) 
+    SELECT COALESCE(SUM(CAST(st.jumlah AS SIGNED) * st.arah), 0) 
     FROM stock_transactions st 
     WHERE st.item_id = sb.item_id
 );

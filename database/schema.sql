@@ -1,5 +1,12 @@
-CREATE DATABASE IF NOT EXISTS inventory_atk;
-USE inventory_atk;
+CREATE DATABASE IF NOT EXISTS inventory_at;
+USE inventory_at;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS stock_transactions;
+DROP TABLE IF EXISTS stock_balances;
+DROP TABLE IF EXISTS items;
+DROP TABLE IF EXISTS users;
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- Tabel Users
 CREATE TABLE IF NOT EXISTS users (
@@ -17,6 +24,7 @@ CREATE TABLE IF NOT EXISTS items (
     nama VARCHAR(100) NOT NULL,
     satuan VARCHAR(20) NOT NULL,
     stok_minimum INT DEFAULT 0,
+    is_active TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

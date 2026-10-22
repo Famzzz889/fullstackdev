@@ -20,7 +20,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Simple Router
 $request = $_SERVER['REQUEST_URI'];
-$basePath = '/Test-FullstackDev/public'; // Adjust based on environment
+$scriptName = $_SERVER['SCRIPT_NAME'];
+$basePath = str_replace('/index.php', '', $scriptName);
 $path = str_replace($basePath, '', $request);
 $path = parse_url($path, PHP_URL_PATH);
 $path = trim($path, '/');
@@ -76,6 +77,44 @@ switch ($path) {
         }
         break;
 
+    case 'items/history':
+        require_once __DIR__ . '/../app/Controllers/ItemController.php';
+        $controller = new ItemController();
+        $controller->history();
+        break;
+
+    case 'items/edit':
+        require_once __DIR__ . '/../app/Controllers/ItemController.php';
+        $controller = new ItemController();
+        $controller->edit();
+        break;
+
+    case 'items/update':
+        require_once __DIR__ . '/../app/Controllers/ItemController.php';
+        $controller = new ItemController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->update();
+        }
+        break;
+
+    case 'items/delete':
+        require_once __DIR__ . '/../app/Controllers/ItemController.php';
+        $controller = new ItemController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->delete();
+        }
+        break;
+
+    case 'items/opname':
+        require_once __DIR__ . '/../app/Controllers/ItemController.php';
+        $controller = new ItemController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->processOpname();
+        } else {
+            $controller->opname();
+        }
+        break;
+
     case 'stock/in':
         require_once __DIR__ . '/../app/Controllers/StockController.php';
         $controller = new StockController();
@@ -96,10 +135,22 @@ switch ($path) {
         }
         break;
 
+    case 'stock/correct':
+        require_once __DIR__ . '/../app/Controllers/StockController.php';
+        $controller = new StockController();
+        $controller->correct();
+        break;
+
     case 'reports':
         require_once __DIR__ . '/../app/Controllers/ReportController.php';
         $controller = new ReportController();
         $controller->index();
+        break;
+
+    case 'reports/consistency':
+        require_once __DIR__ . '/../app/Controllers/ReportController.php';
+        $controller = new ReportController();
+        $controller->consistency();
         break;
 
     default:

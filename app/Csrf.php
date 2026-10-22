@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * CSRF Protection
+ */
 class Csrf {
     public static function generateToken() {
         if (session_status() === PHP_SESSION_NONE) {

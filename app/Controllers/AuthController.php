@@ -5,6 +5,8 @@ class AuthController {
         if (Auth::check()) {
             redirect('dashboard');
         }
+        $config = require __DIR__ . '/../../app/config.php';
+        $baseUrl = $config['app']['base_url'];
         require_once __DIR__ . '/../../views/auth/login.php';
     }
 

@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Database Connection using PDO
+ */
 class Database {
     private static $instance = null;
     private $pdo;

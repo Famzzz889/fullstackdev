@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var string $baseUrl
+ */
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -94,7 +99,7 @@
                     </div>
                 <?php endif; ?>
 
-                <form action="<?= e((require __DIR__ . '/../../app/config.php')['app']['base_url']) ?>/login" method="POST" class="space-y-6" x-data="{ loading: false }" @submit="loading = true">
+                <form action="<?= e($baseUrl) ?>/login" method="POST" class="space-y-6" x-data="{ loading: false }" @submit="loading = true">
                     <?= Csrf::csrf_field() ?>
                     <div>
                         <label for="email" class="block text-sm font-semibold text-slate-700 mb-2">Alamat Email</label>

@@ -3,7 +3,7 @@
 class StockController {
     public function showInForm() {
         $db = Database::getInstance();
-        $stmt = $db->query("SELECT * FROM items WHERE is_active = 1 ORDER BY nama_barang ASC");
+        $stmt = $db->query("SELECT * FROM items WHERE is_active = 1 ORDER BY nama ASC");
         $items = $stmt->fetchAll();
 
         $selectedItemId = $_GET['item_id'] ?? null;
@@ -90,5 +90,62 @@ class StockController {
             Flash::set('error', $result['message']);
             redirect('stock/out');
         }
+    }
+
+    public function correct() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('items');
+        }
+
+        $refId = $_POST['ref_transaction_id'];
+        $keterangan = $_POST['keterangan'];
+        $idempotencyKey = $_POST['idempotency_key'];
+
+        $db = Database::getInstance();
+        
+        // 1. Dapatkan transaksi asal
+        $stmt = $db->prepare("SELECT * FROM stock_transactions WHERE id = ?");
+        $stmt->execute([$refId]);
+        $origin = $stmt->fetch();
+
+        if (!$origin) {
+            Flash::set('error', 'Transaksi asal tidak ditemukan.');
+            redirect('items');
+        }
+
+        // 2. Cek apakah sudah pernah dikoreksi
+        $stmt = $db->prepare("SELECT id FROM stock_transactions WHERE ref_transaction_id = ?");
+        $stmt->execute([$refId]);
+        if ($stmt->fetch()) {
+            Flash::set('error', 'Transaksi ini sudah pernah dikoreksi sebelumnya.');
+            redirect('items/history?id=' . $origin['item_id']);
+        }
+
+        // 3. Tentukan tipe koreksi (kebalikan)
+        $tipe = ($origin['tipe'] == 'masuk' || $origin['tipe'] == 'koreksi_masuk') ? 'koreksi_keluar' : 'koreksi_masuk';
+        $arah = ($origin['arah'] == 1) ? -1 : 1;
+
+        $data = [
+            'item_id' => $origin['item_id'],
+            'jumlah' => $origin['jumlah'],
+            'arah' => $arah,
+            'tipe' => $tipe,
+            'tanggal' => date('Y-m-d'),
+            'pihak' => $origin['pihak'],
+            'keterangan' => '[KOREKSI #' . $refId . '] ' . $keterangan,
+            'created_by' => currentUserId(),
+            'idempotency_key' => $idempotencyKey,
+            'ref_transaction_id' => $refId
+        ];
+
+        $result = StockService::catat($data);
+
+        if ($result['success']) {
+            Flash::set('success', 'Koreksi berhasil disimpan.');
+        } else {
+            Flash::set('error', 'Koreksi gagal: ' . $result['message']);
+        }
+
+        redirect('items/history?id=' . $origin['item_id']);
     }
 }

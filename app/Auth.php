@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @var Database
+ */
 class Auth {
     public static function login($email, $password) {
         $db = Database::getInstance();
